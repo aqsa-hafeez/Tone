@@ -29,13 +29,17 @@ TONE_PROMPTS = {
         "letter or an official request. Use complete sentences and courteous wording, with no slang, "
         "contractions, or emoji. Stay in the SAME language as the input: English input must get "
         "English output; only if the input is already Roman Urdu/Hindi, answer in respectful "
-        "Roman Urdu (using 'aap') without mixing in English sentences."
+        "Roman Urdu (using 'aap', and Urdu words like 'guzarish', 'meherbani', 'shukriya' rather "
+        "than Sanskrit-style Hindi words) without mixing in English sentences."
     ),
     "corporate": (
         "Rewrite this as a polished workplace message: professional, concise, clear and "
-        "action-oriented, using natural business phrasing (like 'please let me know', 'at your "
-        "earliest convenience', 'I will follow up'). No slang or emoji. Keep it brief, "
-        "as a short email line or Slack message, not a long letter."
+        "action-oriented. No slang or emoji. Keep it brief, like one short email line or Slack "
+        "message, and do not add promises, follow-ups, or details that are not in the original. "
+        "Stay in the SAME language as the input: English input gets natural business English "
+        "(like 'please let me know', 'at your earliest convenience'); if the input is Roman "
+        "Urdu/Hindi, reply in polite, professional Roman Urdu (like 'aap se guzarish hai', "
+        "'meherbani karke') and do NOT switch to English."
     ),
     "sarcastic": (
         "Rewrite this with dry, witty sarcasm and irony, the kind that makes people smile. "
@@ -43,13 +47,81 @@ TONE_PROMPTS = {
         "hurtful. The core message must still be understood."
     ),
     "poetic": (
-        "Rewrite this in a poetic, graceful style with light metaphor and rhythm, in one to two "
-        "elegant sentences (or a very short verse). Beautify the wording only: every fact, "
-        "request, time, and name from the original must still be clearly present."
+        "Rewrite this in a poetic, graceful style with light, natural metaphor and rhythm, in "
+        "one to two elegant sentences (or a very short verse). Beautify the wording only: every "
+        "fact, request, time, and name from the original must still be clearly present, and the "
+        "imagery must make sense (no strange or nonsensical comparisons). Stay in the SAME "
+        "language as the input: if it is Roman Urdu/Hindi, use simple, sweet Roman Urdu poetic "
+        "words (like 'dil', 'intezaar', 'subah', 'meherbani'), never heavy Sanskrit-style words."
     ),
     "casual": (
         "Rewrite this in a relaxed, warm, friendly tone, like texting a close friend. Simple "
         "everyday words and contractions, no slang overload and no formal wording."
+    ),
+}
+
+
+# --- Language detection -----------------------------------------------------
+# The output must always match the input language: English in -> English out,
+# Roman Urdu/Hindi in -> Roman Urdu out. Relying on the prompt alone is not
+# reliable, so we detect the language here and tell the model explicitly.
+import re
+
+_ROMAN_URDU_WORDS = {
+    "bhai", "yaar", "yar", "behen", "kal", "aaj", "abhi", "kab", "kahan", "kaun",
+    "kya", "kyun", "kyu", "kaise", "kesi", "kesa", "kaisa", "kaisi", "kitna", "kitne", "kitni",
+    "mujhe", "mujhko", "mujh", "tumhe", "tujhe", "tum", "tumne", "aap", "apna", "apni", "apne",
+    "mera", "meri", "mere", "tera", "teri", "tere", "hum", "humein", "hamein", "humara",
+    "woh", "wo", "yeh", "ye", "unhe", "inhe", "usne", "unhon", "isko", "usko",
+    "hai", "hain", "hoon", "hun", "hy", "hay", "ho", "tha", "thi", "thay", "hoga", "hogi", "honge",
+    "raha", "rahi", "rahe", "rha", "rhi", "rhe", "kr", "kar", "karo", "karna", "karta", "karti",
+    "karein", "krna", "krdo", "kardo", "dena", "dedo", "lena", "lelo", "bhej", "bhejo", "bhejna",
+    "chahiye", "chahta", "chahti", "chahte", "bohot", "bohat", "bahut", "acha", "achha", "accha",
+    "theek", "thik", "sab", "sabhi", "aur", "lekin", "magar", "phir", "jaldi", "kuch", "koi",
+    "kyunki", "agar", "toh", "tou", "saath", "sath", "liye", "lye", "wala", "wali", "wale",
+    "gya", "gaya", "gayi", "gai", "aya", "aaya", "aye", "aana", "ana", "jana", "jao", "chalo",
+    "bata", "batao", "batana", "dekho", "dekh", "baat", "kaam", "ghar", "paisa", "waqt", "raat",
+    "subah", "sham", "din", "sirf", "bas", "pehle", "baad", "tak", "mein", "men", "han", "haan",
+    "nahi", "nahin", "nhi", "nai", "mai", "jo", "jab", "tab", "wahan", "yahan", "shukriya",
+    "meherbani", "maaf", "ki", "ke", "ka", "ko", "se", "pe", "bhi", "hi", "sahi", "zaroor",
+    "zaroori", "chutti", "tabiyat", "khana", "paas", "milna", "milte", "mila", "diya", "diye",
+    "liya", "kiya", "kiye", "karunga", "karungi", "aunga", "aungi", "dunga", "dungi", "lunga",
+    "bolo", "bol", "suno", "sun", "samajh", "pata", "pta", "nazar", "bilkul", "abhi", "kabhi",
+}
+# Ambiguous with common English words, so they don't count on their own.
+_AMBIGUOUS = {"hi", "ho", "se", "ye", "men", "mai", "bas", "sab", "din", "tab", "jo", "ki", "ka"}
+
+
+def detect_language(text: str) -> str:
+    """Returns 'roman_urdu', 'english', or 'other_script' (Urdu/Hindi/Arabic script etc.)."""
+    if re.search(r"[\u0600-\u06FF\u0900-\u097F]", text):
+        return "other_script"
+    words = re.findall(r"[a-zA-Z']+", text.lower())
+    if not words:
+        return "english"
+    strong = sum(1 for w in words if w in _ROMAN_URDU_WORDS and w not in _AMBIGUOUS)
+    weak = sum(1 for w in words if w in _AMBIGUOUS)
+    score = strong + 0.5 * weak
+    if strong >= 1 and (score >= 2 or score / len(words) >= 0.3):
+        return "roman_urdu"
+    if strong == 0 and weak >= 2 and weak / len(words) >= 0.5:
+        return "roman_urdu"
+    return "english"
+
+
+_LANGUAGE_RULES = {
+    "english": (
+        "The text is in English. Your ENTIRE reply must be in English only. "
+        "Do not use any Urdu or Hindi words."
+    ),
+    "roman_urdu": (
+        "The text is in Roman Urdu/Hindi (Urdu written in English letters). Your ENTIRE reply "
+        "must be in Roman Urdu written in English letters (like 'bhai report kal tak bhej dena'). "
+        "Do NOT reply in English, and do NOT use Urdu or Devanagari script."
+    ),
+    "other_script": (
+        "Reply in exactly the same language and the same script as the text. Do not translate "
+        "and do not switch to English or Roman letters."
     ),
 }
 
@@ -89,7 +161,11 @@ def rewrite_text(text: str, tone: str) -> str:
             },
             {
                 "role": "user",
-                "content": f"{instruction}\n\nText to rewrite:\n{text}",
+                "content": (
+                    f"{instruction}\n\n"
+                    f"LANGUAGE RULE (must follow): {_LANGUAGE_RULES[detect_language(text)]}\n\n"
+                    f"Text to rewrite:\n{text}"
+                ),
             },
         ],
         temperature=0.7,
