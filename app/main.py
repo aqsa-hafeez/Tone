@@ -19,7 +19,7 @@ from app.schemas import (
 from app.auth import hash_password, verify_password, create_access_token, get_current_user
 from app.ai import rewrite_text, get_available_tones
 
-FREE_DAILY_LIMIT = int(os.getenv("FREE_DAILY_LIMIT", "10"))
+FREE_DAILY_LIMIT = int(os.getenv("FREE_DAILY_LIMIT", "20"))
 
 app = FastAPI(title="ToneShift API", version="1.0.0")
 
@@ -121,6 +121,7 @@ def rewrite(
             Rewrite.user_id == current_user.id,
             Rewrite.original_text == payload.text,
             Rewrite.tone == payload.tone,
+            Rewrite.rewritten_text != "",  # ignore any bad empty rows saved earlier
         )
         .first()
     )
