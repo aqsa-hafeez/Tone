@@ -61,7 +61,15 @@ def rewrite_text(text: str, tone: str) -> str:
             },
         ],
         temperature=0.7,
-        max_tokens=400,
+        # gpt-oss models "think" before answering, and those thinking tokens count
+        # against this limit. A small limit (e.g. 400) can be used up entirely by
+        # thinking, leaving an EMPTY answer. So: keep thinking short and allow plenty of room.
+        max_tokens=2048,
+        extra_body={"reasoning_effort": "low"},
     )
 
-    return completion.choices[0].message.content.strip()
+    result = (completion.choices[0].message.content or "").strip()
+    if not result:
+        # Never return / store an empty rewrite; main.py turns this into a clean 502.
+        raise RuntimeError("The AI returned an empty response. Please try again.")
+    return result
