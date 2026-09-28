@@ -19,15 +19,17 @@ client = Groq(api_key=_api_key)
 TONE_PROMPTS = {
     "genz": (
         "Rewrite this the way a Gen Z person would actually text it: relaxed, playful, "
-        "with natural current slang (like 'ngl', 'fr', 'lowkey', 'no cap', 'bet') and 1-2 fitting "
-        "emoji. If the text is Roman Urdu/Hindi, use casual Roman Urdu youth slang instead "
-        "(like 'yaar', 'bro', 'scene', 'sahi hai'). Keep it short and don't overdo the slang."
+        "with natural current slang and 1-2 fitting emoji. Keep it short and don't overdo the slang. "
+        "Stay in the SAME language as the input: for English input use English slang (like 'ngl', "
+        "'fr', 'lowkey', 'asap'); only if the input is already Roman Urdu/Hindi, use casual "
+        "Roman Urdu youth slang (like 'yaar', 'bro', 'scene')."
     ),
     "formal": (
         "Rewrite this in a formal, respectful, grammatically precise tone suitable for a formal "
-        "letter or an official request. Use complete sentences, courteous wording, and no slang, "
-        "contractions, or emoji. If the text is Roman Urdu/Hindi, write formal, respectful "
-        "Roman Urdu (use 'aap', polite phrasing), and do not mix in English sentences."
+        "letter or an official request. Use complete sentences and courteous wording, with no slang, "
+        "contractions, or emoji. Stay in the SAME language as the input: English input must get "
+        "English output; only if the input is already Roman Urdu/Hindi, answer in respectful "
+        "Roman Urdu (using 'aap') without mixing in English sentences."
     ),
     "corporate": (
         "Rewrite this as a polished workplace message: professional, concise, clear and "
