@@ -143,6 +143,12 @@ _ROMAN_URDU_WORDS = {
     "zaroori", "chutti", "tabiyat", "khana", "paas", "milna", "milte", "mila", "diya", "diye",
     "liya", "kiya", "kiye", "karunga", "karungi", "aunga", "aungi", "dunga", "dungi", "lunga",
     "bolo", "bol", "suno", "sun", "samajh", "pata", "pta", "nazar", "bilkul", "abhi", "kabhi",
+    # common texting-style abbreviations & extra spellings (very common in fast Roman Urdu chat)
+    "kro", "kry", "bs", "mjhe", "mjy", "mujay", "tmhe", "tmko", "aap", "apko", "apka", "apki",
+    "hafta", "haftay", "hafte", "hafton", "agla", "agli", "agle", "aglay",
+    "sakta", "sakti", "saka", "sakoon", "sakenge", "sakunga", "sakungi", "sakega", "sakegi",
+    "dou", "dena", "lena", "krna", "krdo", "hoga", "hogi", "raha", "wagera", "waghera",
+    "acha", "achi", "thk", "thik", "plz", "jaldi", "abi", "abhi", "kesay", "kesey",
 }
 # Ambiguous with common English words, so they don't count on their own.
 _AMBIGUOUS = {"hi", "ho", "se", "ye", "men", "mai", "bas", "sab", "din", "tab", "jo", "ki", "ka"}
@@ -158,6 +164,11 @@ def detect_language(text: str) -> str:
     strong = sum(1 for w in words if w in _ROMAN_URDU_WORDS and w not in _AMBIGUOUS)
     weak = sum(1 for w in words if w in _AMBIGUOUS)
     score = strong + 0.5 * weak
+    # Short messages (typical quick texts) carry less signal per word, so a single
+    # clear Roman Urdu marker is enough to decide, instead of requiring a high ratio.
+    if len(words) <= 8:
+        if strong >= 1:
+            return "roman_urdu"
     if strong >= 1 and (score >= 2 or score / len(words) >= 0.3):
         return "roman_urdu"
     if strong == 0 and weak >= 2 and weak / len(words) >= 0.5:
