@@ -46,10 +46,13 @@ TONE_PROMPTS = {
         "or flowery. No slang, no emoji. It must feel different from a formal letter: crisp, "
         "direct, everyday business phrasing (like 'Apologies for missing your call', 'Could you "
         "please send...', 'Running a bit late'), contractions allowed, and shorter than a formal "
-        "version. When apologizing, prefer 'Apologies for...' or 'I apologize for...' over a plain "
-        "'Sorry ...' opener, so it reads distinctly more professional than the casual tone rather "
-        "than identical to it. Do NOT add promises, follow-ups, or any new details or words (like "
-        "'scheduled', 'meeting', 'project') that are not in the original.\n"
+        "version. When apologizing IN ENGLISH, prefer 'Apologies for...' or 'I apologize for...' "
+        "over a plain 'Sorry ...' opener. When apologizing IN ROMAN URDU, prefer 'Maazrat chahta "
+        "hoon...' or 'Maafi chahta hoon...' over a plain casual 'sorry'. Either way it must read "
+        "distinctly more professional than the casual tone, never identical to it, and must stay "
+        "in the same language as the input (this rule does not override the language rule below). "
+        "Do NOT add promises, follow-ups, or any new details or words (like 'scheduled', 'meeting', "
+        "'project') that are not in the original.\n"
         "Style examples (STYLE ONLY, never copy their words):\n"
         "- English: I'm running a few minutes behind due to heavy traffic and will join as soon as I can.\n"
         "- Roman Urdu: Traffic ki wajah se mujhe pohanchne mein thora waqt lage ga, aap ki "
@@ -218,9 +221,11 @@ def rewrite_text(text: str, tone: str) -> str:
             {
                 "role": "user",
                 "content": (
+                    f"LANGUAGE RULE (highest priority, overrides any example below): "
+                    f"{_LANGUAGE_RULES[detect_language(text)]}\n\n"
                     f"{instruction}\n\n"
-                    f"LANGUAGE RULE (must follow): {_LANGUAGE_RULES[detect_language(text)]}\n\n"
-                    f"Text to rewrite:\n{text}"
+                    f"Text to rewrite:\n{text}\n\n"
+                    f"Reminder \u2014 LANGUAGE RULE: {_LANGUAGE_RULES[detect_language(text)]}"
                 ),
             },
         ],
