@@ -182,6 +182,35 @@ _LANGUAGE_RULES = {
 }
 
 
+# --- Sensitive-topic guard ---------------------------------------------------
+# Death, serious illness, accidents, etc. must never get jokes, sarcasm, or a
+# celebratory/laughing emoji, no matter which tone was picked.
+_SENSITIVE_WORDS = {
+    "death", "died", "dead", "passed away", "funeral", "demise", "grief",
+    "accident", "hospital", "hospitalized", "critical condition", "emergency",
+    "suicide", "cancer", "coma", "surgery", "ICU",
+    "death ho", "death ho gaya", "death ho gayi", "wafat", "wafaat", "intiqal",
+    "guzar gaye", "guzar gayi", "guzar gaya", "khatam ho gaya", "mar gaya",
+    "mar gayi", "mout", "maut", "janaza", "hadsa", "accident ho", "haadsa",
+    "bimari", "beemar", "tabiyat kharab", "emergency hai", "expire ho gaye",
+}
+
+
+def is_sensitive(text: str) -> bool:
+    t = text.lower()
+    return any(w in t for w in _SENSITIVE_WORDS)
+
+
+_SENSITIVE_OVERRIDE = (
+    "IMPORTANT OVERRIDE: this message is about a death, illness, accident, or other serious/sad "
+    "situation. Regardless of the tone above, do NOT use sarcasm, jokes, irony, exaggeration, "
+    "slang, playful wording, or any laughing/celebratory/upbeat emoji. Rewrite it in a gentle, "
+    "sincere, respectful way that keeps the tone's general formality level but is emotionally "
+    "appropriate for sad or serious news. A single gentle, caring emoji (like a folded-hands or "
+    "broken-heart emoji) is acceptable only if the tone normally allows emoji at all; otherwise use none."
+)
+
+
 def get_available_tones() -> list[str]:
     return list(TONE_PROMPTS.keys())
 
@@ -224,7 +253,8 @@ def rewrite_text(text: str, tone: str) -> str:
                     f"LANGUAGE RULE (highest priority, overrides any example below): "
                     f"{_LANGUAGE_RULES[detect_language(text)]}\n\n"
                     f"{instruction}\n\n"
-                    f"Text to rewrite:\n{text}\n\n"
+                    + (f"{_SENSITIVE_OVERRIDE}\n\n" if is_sensitive(text) else "")
+                    + f"Text to rewrite:\n{text}\n\n"
                     f"Reminder \u2014 LANGUAGE RULE: {_LANGUAGE_RULES[detect_language(text)]}"
                 ),
             },
