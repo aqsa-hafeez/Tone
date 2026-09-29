@@ -149,6 +149,8 @@ _ROMAN_URDU_WORDS = {
     "sakta", "sakti", "saka", "sakoon", "sakenge", "sakunga", "sakungi", "sakega", "sakegi",
     "dou", "dena", "lena", "krna", "krdo", "hoga", "hogi", "raha", "wagera", "waghera",
     "acha", "achi", "thk", "thik", "plz", "jaldi", "abi", "abhi", "kesay", "kesey",
+    "hamesha", "krta", "krti", "krte", "sida", "seedha", "wapis", "wapsi", "faraham",
+    "darkhwast", "guzarish", "zarurat", "zaroorat",
 }
 # Ambiguous with common English words, so they don't count on their own.
 _AMBIGUOUS = {"hi", "ho", "se", "ye", "men", "mai", "bas", "sab", "din", "tab", "jo", "ki", "ka"}
@@ -184,7 +186,12 @@ _LANGUAGE_RULES = {
     "roman_urdu": (
         "The text is in Roman Urdu/Hindi (Urdu written in English letters). Your ENTIRE reply "
         "must be in Roman Urdu written in English letters (like 'bhai report kal tak bhej dena'). "
-        "Do NOT reply in English, and do NOT use Urdu or Devanagari script."
+        "The input may mix in ordinary English loanwords (like 'plan', 'cancel', 'minute', "
+        "'traffic', 'meeting') \u2014 this is completely normal, everyday Roman Urdu texting, NOT "
+        "English. Keep replying fully in Roman Urdu regardless, borrowing the same kind of common "
+        "English words only where a real Roman Urdu speaker naturally would (e.g. 'plan cancel na "
+        "karo'), never switching to full English sentences. Do NOT reply in English, and do NOT "
+        "use Urdu or Devanagari script."
     ),
     "other_script": (
         "Reply in exactly the same language and the same script as the text. Do not translate "
@@ -204,6 +211,14 @@ _SENSITIVE_WORDS = {
     "guzar gaye", "guzar gayi", "guzar gaya", "khatam ho gaya", "mar gaya",
     "mar gayi", "mout", "maut", "janaza", "hadsa", "accident ho", "haadsa",
     "bimari", "beemar", "tabiyat kharab", "emergency hai", "expire ho gaye",
+    # injuries / falls / fractures (English)
+    "broke her arm", "broke his arm", "broken arm", "broken leg", "broken bone",
+    "fractured", "fracture", "fell down the stairs", "fell down", "badly hurt",
+    "seriously injured", "injured badly", "rushed to the hospital",
+    # injuries / falls (Roman Urdu)
+    "gir gaya", "gir gayi", "gir gai", "gir gain", "haath tut", "hath tut", "pair tut",
+    "paon tut", "tut gaya", "tut gayi", "tut gai", "toot gaya", "toot gayi", "chot lag",
+    "chot lagi", "zakhmi", "ghayal", "haddi tut",
 }
 
 
