@@ -207,7 +207,10 @@ _SENSITIVE_OVERRIDE = (
     "slang, playful wording, or any laughing/celebratory/upbeat emoji. Rewrite it in a gentle, "
     "sincere, respectful way that keeps the tone's general formality level but is emotionally "
     "appropriate for sad or serious news. A single gentle, caring emoji (like a folded-hands or "
-    "broken-heart emoji) is acceptable only if the tone normally allows emoji at all; otherwise use none."
+    "broken-heart emoji) is acceptable only if the tone normally allows emoji at all; otherwise use none. "
+    "Keep the exact same speaker perspective as the original: if the original says 'my' (the speaker's "
+    "own loss/news), the rewrite must also say 'my', never switch to comforting someone else by saying "
+    "'your' \u2014 do not turn the speaker's own news into a sympathy message about the reader's loss."
 )
 
 
