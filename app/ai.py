@@ -20,16 +20,15 @@ client = Groq(api_key=_api_key)
 TONE_PROMPTS = {
     "genz": (
         "TONE: Gen Z. Rewrite it exactly the way a Gen Z person would text a friend: relaxed, "
-        "playful, a little dramatic, with natural current slang and 1-2 fitting emoji placed "
-        "naturally. Short, punchy, lowercase is fine. Never sound like a brand or a parent trying "
-        "to be cool, and don't stuff in slang. Choose emoji that match the feeling (an apology gets "
-        "😅 😭 🙏, never hearts or party emoji), and do NOT add promises or plans that are not in "
+        "playful, a little dramatic, with natural current slang. Short, punchy, lowercase is "
+        "fine. Never sound like a brand or a parent trying to be cool, and don't stuff in slang. "
+        "Do NOT use any emoji at all in this tone. Do NOT add promises or plans that are not in "
         "the original.\n"
         "English slang: ngl, fr, lowkey, no cap, bet, rn, tbh, 'not me doing X'. "
         "Roman Urdu slang: yaar, bro, scene, sahi hai, full on, bilkul.\n"
         "Style examples (STYLE ONLY, never copy their words):\n"
-        "- English: ngl I'm gonna be late, traffic is actually insane rn 😭\n"
-        "- Roman Urdu: yaar main thora late ho jaunga, traffic ne toh scene hi kharab kar diya 😭"
+        "- English: ngl I'm gonna be late, traffic is actually insane rn\n"
+        "- Roman Urdu: yaar main thora late ho jaunga, traffic ne toh scene hi kharab kar diya"
     ),
     "formal": (
         "TONE: Formal. Rewrite it in a respectful, dignified, grammatically perfect style suited "
